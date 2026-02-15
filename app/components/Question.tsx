@@ -1,10 +1,10 @@
-import { Question as QuestionType } from '../quizData';
+import { Question as QuestionType, PersonalityType } from '../quizData';
 
 interface QuestionProps {
   question: QuestionType;
   currentIndex: number;
   totalQuestions: number;
-  onAnswer: (personalityType: string) => void;
+  onAnswer: (personalityType: PersonalityType) => void;
 }
 
 export default function Question({ question, currentIndex, totalQuestions, onAnswer }: QuestionProps) {

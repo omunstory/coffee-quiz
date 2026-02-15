@@ -50,7 +50,7 @@ export default function Results({ nickname, answers, onRestart }: ResultsProps) 
     // Send to Google Sheets
     setIsSubmitting(true);
     try {
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxMmzjllAa54o1S-_oSM1U7bbYbRiLYKCXsttAcTd9dmbpwNB2c_txPMFnqBfOxC6tC/exec', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbydXe6LZO-vmJt6NmnoOsJaqino9EoSbOZcKr6DuwgZuMW9d3yi4AovnSNeTnSxdrNH/exec', {
         method: 'POST',
         mode: 'no-cors',
         headers: {

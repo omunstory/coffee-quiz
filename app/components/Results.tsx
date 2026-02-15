@@ -19,13 +19,14 @@ export default function Results({ nickname, answers, onRestart }: ResultsProps) 
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [couponReceived, setCouponReceived] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Calculate personality percentages
   const results = calculateResults(answers);
   const primaryResult = results[0];
   const otherResults = results.slice(1);
 
-  const handleCouponSubmit = (e: React.FormEvent) => {
+  const handleCouponSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
 
@@ -46,9 +47,31 @@ export default function Results({ nickname, answers, onRestart }: ResultsProps) 
       return;
     }
 
-    // Success
-    console.log('Coupon request:', { email, marketingConsent, nickname });
-    setCouponReceived(true);
+    // Send to Google Sheets
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxXAxl-cPeOMvOo1D5mltJ-jf_HSaiNvCP2oXpYzA1Xvbpamb3MCdWR6o3jEm5HHgr_/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nickname: nickname,
+          email: email,
+          personalityType: personalities[primaryResult.type].name,
+          percentage: primaryResult.percentage + '%'
+        })
+      });
+
+      // no-cors mode doesn't allow reading response, so we assume success
+      setCouponReceived(true);
+    } catch (error) {
+      console.error('Error submitting coupon:', error);
+      setValidationError('전송 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -124,9 +147,10 @@ export default function Results({ nickname, answers, onRestart }: ResultsProps) 
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#6b4423] text-white font-semibold rounded-lg hover:bg-[#5a3a1e] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#9d7c5f] focus:ring-offset-2"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-[#6b4423] text-white font-semibold rounded-lg hover:bg-[#5a3a1e] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#9d7c5f] focus:ring-offset-2"
             >
-              쿠폰 받기
+              {isSubmitting ? '전송 중...' : '쿠폰 받기'}
             </button>
           </form>
         ) : (
